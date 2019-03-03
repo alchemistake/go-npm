@@ -18,8 +18,8 @@ type Client struct {
 
 //Membership npm org membership
 type Membership struct{
-  user string
-  role string
+  User string `json:"user"`
+  Role string `json:"role"`
 }
 
 //NewBasicAuthClient using username:pass
@@ -33,11 +33,11 @@ func NewBasicAuthClient(username, password string) *Client {
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	req.SetBasicAuth(s.Username, s.Password)
 	client := &http.Client{}
+  req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-  fmt.Println(resp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -46,7 +46,6 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if 200 != resp.StatusCode {
 		return nil, fmt.Errorf("%s", body)
 	}
-  fmt.Println(string(body))
 	return body, nil
 }
 
@@ -70,26 +69,47 @@ func (s *Client) GetUsers(org string) (interface{}, error) {
 }
 
 //AddUser to npm org
-func (s *Client) AddUser(org, user, role string) (bool, error) {
+func (s *Client) AddUser(org, user, role string) ( error) {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
   fmt.Println(url)
-  member := Membership{user: user, role: role }
-  fmt.Println(member)
+  member := Membership{User: user, Role: role }
   b, err := json.Marshal(member)
     if err != nil {
         fmt.Println(err)
-        return false, nil
+        return nil
     }
     fmt.Println(string(b))
   body := bytes.NewBuffer(b)
-	req, err := http.NewRequest("PUT", url, body)
+	req, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
-		return false, err
+		return  err
 	}
   fmt.Println(req)
 	_, err = s.doRequest(req)
 	if err != nil {
-		return false, err
+		return  err
 	}
-	return true, nil
+	return  nil
+}
+
+//DeleteUser from npm org
+func (s *Client) DeleteUser(org, user string) (error) {
+	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
+  fmt.Println(url)
+  member := Membership{User: user}
+  b, err := json.Marshal(member)
+    if err != nil {
+        return  err
+    }
+    fmt.Println(string(b))
+  body := bytes.NewBuffer(b)
+	req, err := http.NewRequest(http.MethodDelete, url, body)
+	if err != nil {
+		return  err
+	}
+	_, err = s.doRequest(req)
+	if err != nil {
+		return  err
+	}
+	return  nil
 }
