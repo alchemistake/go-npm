@@ -50,26 +50,24 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 }
 
 //GetUsers Get all users from org
-func (s *Client) GetUsers(org, user string) (bool, error) {
+func (s *Client) GetUsers(org, user string) (interface{}, error) {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	bytes, err := s.doRequest(req)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	var data  map[string]interface{}
 	err = json.Unmarshal(bytes, &data)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-  if data[user] != nil {
-    return true, nil
-  }
-	return false, nil
+
+	return data, nil
 }
 
 //AddUser to npm org
