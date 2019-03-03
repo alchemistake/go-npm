@@ -5,6 +5,7 @@ import (
   "fmt"
   "encoding/json"
   "io/ioutil"
+  "bytes"
 )
 
 const baseURL string = "https://registry.npmjs.org/-"
@@ -13,6 +14,12 @@ const baseURL string = "https://registry.npmjs.org/-"
 type Client struct {
 	Username string
 	Password string
+}
+
+//Membership npm org membership
+type Membership struct{
+  user string
+  role string
 }
 
 //NewBasicAuthClient using username:pass
@@ -30,6 +37,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+  fmt.Println(resp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -38,7 +46,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if 200 != resp.StatusCode {
 		return nil, fmt.Errorf("%s", body)
 	}
-  // fmt.Println(string(body))
+  fmt.Println(string(body))
 	return body, nil
 }
 
@@ -59,4 +67,29 @@ func (s *Client) GetUsers(org string) (interface{}, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+//AddUser to npm org
+func (s *Client) AddUser(org, user, role string) (bool, error) {
+	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
+  fmt.Println(url)
+  member := Membership{user: user, role: role }
+  fmt.Println(member)
+  b, err := json.Marshal(member)
+    if err != nil {
+        fmt.Println(err)
+        return false, nil
+    }
+    fmt.Println(string(b))
+  body := bytes.NewBuffer(b)
+	req, err := http.NewRequest("PUT", url, body)
+	if err != nil {
+		return false, err
+	}
+  fmt.Println(req)
+	_, err = s.doRequest(req)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
