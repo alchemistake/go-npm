@@ -50,7 +50,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 }
 
 //GetUsers Get all users from org
-func (s *Client) GetUsers(org, user string) (interface{}, error) {
+func (s *Client) GetUsers(org, user string) (map[string]string, error) {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -60,12 +60,11 @@ func (s *Client) GetUsers(org, user string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data  map[string]interface{}
+	var data  map[string]string
 	err = json.Unmarshal(bytes, &data)
 	if err != nil {
 		return nil, err
 	}
-
 
 	return data, nil
 }
