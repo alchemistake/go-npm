@@ -50,7 +50,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 }
 
 //GetUsers Get all users from org
-func (s *Client) GetUsers(org, user string) (map[string]string, error) {
+func (s *Client) GetUsers(org string) (map[string]string, error) {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
