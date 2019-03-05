@@ -43,9 +43,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if 200 != resp.StatusCode {
-		return nil, fmt.Errorf("%s", body)
-	}
+
 	return body, nil
 }
 
@@ -76,16 +74,14 @@ func (s *Client) AddUser(org, user, role string) error {
 	member := Membership{User: user, Role: role}
 	b, err := json.Marshal(member)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return err
 	}
-	fmt.Println(string(b))
+
 	body := bytes.NewBuffer(b)
 	req, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(req)
 	_, err = s.doRequest(req)
 	if err != nil {
 		return err
