@@ -1,11 +1,11 @@
 package npm
 
 import (
-  "net/http"
-  "fmt"
-  "encoding/json"
-  "io/ioutil"
-  "bytes"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 const baseURL string = "https://registry.npmjs.org/-"
@@ -17,9 +17,9 @@ type Client struct {
 }
 
 //Membership npm org membership
-type Membership struct{
-  User string `json:"user"`
-  Role string `json:"role"`
+type Membership struct {
+	User string `json:"user"`
+	Role string `json:"role"`
 }
 
 //NewBasicAuthClient using username:pass
@@ -33,7 +33,7 @@ func NewBasicAuthClient(username, password string) *Client {
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	req.SetBasicAuth(s.Username, s.Password)
 	client := &http.Client{}
-  req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (s *Client) GetUsers(org, user string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data  map[string]string
+	var data map[string]string
 	err = json.Unmarshal(bytes, &data)
 	if err != nil {
 		return nil, err
@@ -70,47 +70,47 @@ func (s *Client) GetUsers(org, user string) (map[string]string, error) {
 }
 
 //AddUser to npm org
-func (s *Client) AddUser(org, user, role string) ( error) {
+func (s *Client) AddUser(org, user, role string) error {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
-  fmt.Println(url)
-  member := Membership{User: user, Role: role }
-  b, err := json.Marshal(member)
-    if err != nil {
-        fmt.Println(err)
-        return nil
-    }
-    fmt.Println(string(b))
-  body := bytes.NewBuffer(b)
+	fmt.Println(url)
+	member := Membership{User: user, Role: role}
+	b, err := json.Marshal(member)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	fmt.Println(string(b))
+	body := bytes.NewBuffer(b)
 	req, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
-		return  err
+		return err
 	}
-  fmt.Println(req)
+	fmt.Println(req)
 	_, err = s.doRequest(req)
 	if err != nil {
-		return  err
+		return err
 	}
-	return  nil
+	return nil
 }
 
 //DeleteUser from npm org
-func (s *Client) DeleteUser(org, user string) (error) {
+func (s *Client) DeleteUser(org, user string) error {
 	url := fmt.Sprintf(baseURL+"/org/%s/user", org)
-  fmt.Println(url)
-  member := Membership{User: user}
-  b, err := json.Marshal(member)
-    if err != nil {
-        return  err
-    }
-    fmt.Println(string(b))
-  body := bytes.NewBuffer(b)
+	fmt.Println(url)
+	member := Membership{User: user}
+	b, err := json.Marshal(member)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	body := bytes.NewBuffer(b)
 	req, err := http.NewRequest(http.MethodDelete, url, body)
 	if err != nil {
-		return  err
+		return err
 	}
 	_, err = s.doRequest(req)
 	if err != nil {
-		return  err
+		return err
 	}
-	return  nil
+	return nil
 }
