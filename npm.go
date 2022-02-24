@@ -21,7 +21,7 @@ type Membership struct {
 	Role string `json:"role"`
 }
 
-func NewBasicAuthClient(token string) *Client {
+func NewTokenClient(token string) *Client {
 	return &Client{
 		Token: token
 	}
