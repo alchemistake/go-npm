@@ -12,8 +12,7 @@ const baseURL string = "https://registry.npmjs.org/-"
 
 //Client struct for npm
 type Client struct {
-	Username string
-	Password string
+	Token 	string
 }
 
 //Membership npm org membership
@@ -22,18 +21,18 @@ type Membership struct {
 	Role string `json:"role"`
 }
 
-//NewBasicAuthClient using username:pass
-func NewBasicAuthClient(username, password string) *Client {
+func NewBasicAuthClient(token string) *Client {
 	return &Client{
-		Username: username,
-		Password: password,
+		Token: token
 	}
 }
 
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
-	req.SetBasicAuth(s.Username, s.Password)
 	client := &http.Client{}
+	var bearer = "Bearer " + s.Token
+
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Authorization", bearer)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
