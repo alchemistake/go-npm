@@ -29,7 +29,7 @@ func NewTokenClient(token string) *Client {
 
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	client := &http.Client{}
-	var bearer = "Bearer " + s.Token
+	bearer := "Bearer " + s.Token
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Authorization", bearer)
